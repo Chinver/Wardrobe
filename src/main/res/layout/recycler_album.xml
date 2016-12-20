@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="104dp"
+    android:layout_height="104dp">
+
+    <ImageView
+        android:id="@+id/image_recycler_album_photo"
+        android:layout_width="104dp"
+        android:layout_height="104dp"
+        android:contentDescription="@string/hint_for_blind_take_photo"
+        android:scaleType="fitCenter"
+        android:src="@drawable/but_camera" />
+
+    <RelativeLayout
+        android:id="@+id/layout_recycler_album"
+        android:layout_width="104dp"
+        android:layout_height="104dp"
+        android:background="@color/black_shadow">
+
+        <ImageView
+            android:id="@+id/image_recycler_album_commit"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="4dp"
+            android:contentDescription="@string/hint_for_blind_choose_photo_yes"
+            android:src="@drawable/icon_sel" />
+    </RelativeLayout>
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/layout_update_photo_item_commit"-->
+    <!--android:layout_width="104dp"-->
+    <!--android:layout_height="104dp"-->
+    <!--android:layout_gravity="top"-->
+    <!--android:background="@color/black_shadow"-->
+    <!--android:visibility="gone">-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="24dp"-->
+    <!--android:layout_height="24dp"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_marginEnd="4dp"-->
+    <!--android:layout_marginRight="4dp"-->
+    <!--android:layout_marginTop="4dp"-->
+    <!--android:contentDescription="@string/hint_for_blind_choose_photo_yes"-->
+    <!--android:src="@drawable/icon_sel"-->
+    <!--/>-->
+    <!--</RelativeLayout>-->
+
+
+</FrameLayout>
