@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+import com.igexin.sdk.PushManager;
 import com.wardrobe.www.db.DatabaseHelper;
-
-import org.xutils.x;
+import com.wardrobe.www.service.serviceImpl.IntentService;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -43,6 +43,8 @@ public class BaseActivity extends Activity {
             writeSDFile(df.format(new Date()), "log.txt");//写入文件夹创建时间，即APP安装时间
         }
 
+        PushManager.getInstance().initialize(this.getApplicationContext(), null);
+        PushManager.getInstance().registerPushIntentService(this.getApplicationContext(), IntentService.class);
     }
 
     private void writeSDFile(String str, String fileName) {//写入文件
@@ -66,7 +68,6 @@ public class BaseActivity extends Activity {
             Log.d(TAG, e.toString());
         }
     }
-
 
 
 }
