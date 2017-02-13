@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wardrobe.www.Utils.LogUtil;
 import com.wardrobe.www.db.DatabaseHelper;
 import com.wardrobe.www.model.Clothes;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
@@ -185,7 +186,7 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
         } else
 
         {
-            Log.e(TAG, "There is no action bar");
+            LogUtil.e(TAG, "There is no action bar");
         }
 
     }

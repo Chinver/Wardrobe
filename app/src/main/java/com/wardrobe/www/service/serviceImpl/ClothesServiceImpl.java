@@ -4,8 +4,8 @@ package com.wardrobe.www.service.serviceImpl;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
+import com.wardrobe.www.Utils.LogUtil;
 import com.wardrobe.www.db.DatabaseHelper;
 import com.wardrobe.www.model.Clothes;
 import com.wardrobe.www.service.ClothesServiceI;
@@ -28,7 +28,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 
     @Override
     public int insertClothes(DatabaseHelper databaseHelper, Clothes clothes) {
-        Log.d(TAG, TABLE_NAME + " --> insert clothes");
+        LogUtil.d(TAG, TABLE_NAME + " --> insert clothes");
 
         db = databaseHelper.getReadableDatabase();
 //        db.beginTransaction(); // 开始事务
@@ -49,7 +49,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 //            db.setTransactionSuccessful(); // 设置事务成功完成
             }
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+            LogUtil.e(TAG, e.toString());
         } finally {
 //            db.endTransaction(); // 结束事务
             db.close();
@@ -59,7 +59,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 
     @Override
     public int isClothesExist(DatabaseHelper databaseHelper, Clothes clothes) {
-        Log.d(TAG, TABLE_NAME + " --> select product");
+        LogUtil.d(TAG, TABLE_NAME + " --> select product");
 
         db = databaseHelper.getReadableDatabase();
         db.beginTransaction(); // 开始事务
@@ -76,7 +76,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 
             db.setTransactionSuccessful(); // 设置事务成功完成
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+            LogUtil.e(TAG, e.toString());
         } finally {
             db.endTransaction(); // 结束事务
         }
@@ -85,7 +85,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 
     @Override
     public List<Clothes> showClothesByDivision(DatabaseHelper databaseHelper, String division) {
-        Log.d(TAG, TABLE_NAME + " --> select clothes for show");
+        LogUtil.d(TAG, TABLE_NAME + " --> select clothes for show");
 
         db = databaseHelper.getReadableDatabase();
         db.beginTransaction(); // 开始事务
@@ -103,14 +103,14 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
                 index.setTime(cursor.getString(3));
                 index.setName(cursor.getString(4));
                 index.setDate(cursor.getString(5));
-                Log.d(TAG, " name=" + index.getName() + " time=" + index.getTime() + " date=" + index.getDate());
+                LogUtil.d(TAG, " name=" + index.getName() + " time=" + index.getTime() + " date=" + index.getDate());
                 clothesList.add(index);
             }
             cursor.close();
 
             db.setTransactionSuccessful(); // 设置事务成功完成
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+            LogUtil.e(TAG, e.toString());
         } finally {
             db.endTransaction(); // 结束事务
         }
@@ -119,7 +119,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 
     @Override
     public int deleteClothesByName(DatabaseHelper databaseHelper, String name) {
-        Log.d(TAG, TABLE_NAME + " --> delete clothes by name");
+        LogUtil.d(TAG, TABLE_NAME + " --> delete clothes by name");
 
         db = databaseHelper.getWritableDatabase();
 
@@ -132,7 +132,7 @@ public class ClothesServiceImpl extends BaseServiceImpl implements ClothesServic
 //                db.update(TABLE_NAME, cValue, "role_code=? and status=1", new String[]{role.getCode()});
             return 1;
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
+            LogUtil.e(TAG, e.toString());
         } finally {
             db.close();
         }

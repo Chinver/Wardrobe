@@ -3,38 +3,31 @@ package com.wardrobe.www;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Fade;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.wardrobe.www.Utils.LogUtil;
 import com.wardrobe.www.adapter.WardrobeAdapter;
 import com.wardrobe.www.db.DatabaseHelper;
 import com.wardrobe.www.model.Clothes;
-import com.wardrobe.www.service.RecyclerItemClickListener;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xutils.x;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,16 +45,12 @@ public class WardrobeActivity extends BaseActivity {
     private List<Clothes> clothesList;
     private ClothesServiceImpl clothesService;
     private DatabaseHelper databaseHelper;
-    private WardrobeAdapter wardrobeAdapter;
     private TextView emptyHintText;
     private RecyclerView wardrobeRecycler;
+    private WardrobeAdapter wardrobeAdapter;
 
     private static final int DELETE_CLOTHES = 1;
     private static final int INSERT_CLOTHES = 2;
-
-//    @ViewInject(R.id.grid_product_display)
-//    private GridView displayGridView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +61,9 @@ public class WardrobeActivity extends BaseActivity {
     }
 
     private void init() {
-        x.view().inject(this);
         initProduct();
         initIntent();
         initRecycler();
-//        initGrid();
     }
 
     private void initIntent() {
@@ -107,7 +94,6 @@ public class WardrobeActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        initGrid();
     }
 
     @Override
@@ -151,34 +137,25 @@ public class WardrobeActivity extends BaseActivity {
                 }
             });
         } else {
-            Log.e(TAG, "There is no action bar");
+            LogUtil.e(TAG, "There is no action bar");
         }
+
+//        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(mToolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onBackPressed();
+//            }
+//        });
+//        //使用CollapsingToolbarLayout必须把title设置到CollapsingToolbarLayout上，设置到Toolbar上则不会显示
+//        CollapsingToolbarLayout mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
+//        mCollapsingToolbarLayout.setTitle("CollapsingToolbarLayout");
+//        //通过CollapsingToolbarLayout修改字体颜色
+//        mCollapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);//设置还没收缩时状态下字体颜色
+//        mCollapsingToolbarLayout.setCollapsedTitleTextColor(Color.GREEN);//设置收缩后Toolbar上字体
     }
-
-
-//    private void initGrid() {
-//
-//        displayGridView = (GridView) findViewById(R.id.grid_product_display);
-//        if (productList != null && productList.size() > 0) {
-//            productList.clear();
-//        } else {
-//            productList = new ArrayList<>();
-//        }
-//        productList = productService.showProductsByDivision(databaseHelper, division);
-//        if (productList.size() > 1) {
-//            productList = quickSort(productList, 0, productList.size() - 1);
-//        }
-//        if (productList.size() == 0) {
-//            emptyHintText.setVisibility(View.VISIBLE);
-//            displayGridView.setVisibility(View.GONE);
-//        } else {
-//            emptyHintText.setVisibility(View.GONE);
-//            displayGridView.setVisibility(View.VISIBLE);
-//            WardrobeAdapter displayGridViewAdapter = new WardrobeAdapter(WardrobeActivity.this, productList);
-//            displayGridView.setAdapter(displayGridViewAdapter);// 为GridView设置适配器
-//            displayGridView.setOnItemClickListener(this);
-//        }
-//    }
 
     private void initRecycler() {
         emptyHintText = (TextView) findViewById(R.id.text_wardrobe_empty);
@@ -186,6 +163,7 @@ public class WardrobeActivity extends BaseActivity {
         wardrobeRecycler.setLayoutManager(new GridLayoutManager(this, 2));//设置布局管理器
         // 设置item动画
         wardrobeRecycler.setItemAnimator(new DefaultItemAnimator());
+        wardrobeRecycler.addItemDecoration(new SpaceItemDecoration(16));
 //        wardrobeRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
 //
 //            @Override
@@ -226,14 +204,15 @@ public class WardrobeActivity extends BaseActivity {
 //            }
             emptyHintText.setVisibility(View.GONE);
             wardrobeRecycler.setVisibility(View.VISIBLE);
-            wardrobeAdapter = new WardrobeAdapter(WardrobeActivity.this, clothesList);
+            wardrobeAdapter = new WardrobeAdapter(clothesList);
             wardrobeRecycler.setAdapter(wardrobeAdapter);// 为GridView设置适配器
-            wardrobeAdapter.setOnItemClickListener(new RecyclerItemClickListener() {
+            wardrobeRecycler.addOnItemTouchListener(new OnItemClickListener() {
                 @Override
-                public void onItemClick(View view, int position) {
-                    bundle.putInt("position", position);
-                    bundle.putString("division", division);
-                    bundle.putString("imgUrl", clothesList.get(position).getImgUrl());
+                public void SimpleOnItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+                    Clothes clothes = (Clothes) baseQuickAdapter.getItem(i);
+                    bundle.putInt("position", i);
+                    bundle.putString("division", clothes.getDivision());
+                    bundle.putString("imgUrl", clothes.getImgUrl());
                     bundle.putParcelableArrayList("clothes", (ArrayList<Clothes>) clothesList);
                     intent.putExtras(bundle);
                     intent.setClass(WardrobeActivity.this, ClothesActivity.class);
@@ -309,6 +288,39 @@ public class WardrobeActivity extends BaseActivity {
             }
         }
         return clothesList;
+    }
+
+    public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
+        int mSpace;
+
+        /**
+         * @param space 传入的值，其单位视为dp
+         */
+        public SpaceItemDecoration(int space) {
+            this.mSpace = WardrobeActivity.this.getResources().getDimensionPixelSize(R.dimen.divider);
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int itemCount = wardrobeAdapter.getItemCount();
+            int pos = parent.getChildAdapterPosition(view);
+            LogUtil.d(TAG, "itemCount>>" + itemCount + ";Position>>" + pos);
+//
+
+//            outRect.bottom = 0;
+
+            if (pos > 1) {
+                outRect.top = mSpace;
+            }else {
+                outRect.top = 0;
+            }
+            if (pos%2==0){
+                outRect.right=mSpace;
+            }else {
+                outRect.right = 0;
+            }
+
+        }
     }
 
 }

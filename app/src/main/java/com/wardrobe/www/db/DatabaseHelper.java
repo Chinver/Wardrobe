@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
+import com.wardrobe.www.Utils.LogUtil;
+
 /**
  * Created by admin on 2016/4/27.
  */
@@ -50,7 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {// 继承SQLiteOpenHelper�
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
         // 数据库实际被创建是在getWritableDatabase()或getReadableDatabase()方法调用时
-        Log.d(TAG, "DatabaseHelper Constructor");
+        LogUtil.d(TAG, "DatabaseHelper Constructor");
         // CursorFactory设置为null,使用系统默认的工厂类
     }
 
@@ -63,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {// 继承SQLiteOpenHelper�
         // onCreate方法有一个 SQLiteDatabase对象作为参数，根据需要对这个对象填充表和初始化数据
         // 这个方法中主要完成创建数据库后对数据库的操作
 
-        Log.d(TAG, "DatabaseHelper onCreate");
+        LogUtil.d(TAG, "DatabaseHelper onCreate");
 
         db.execSQL(CREATE_TABLE_CLOTHES);
 
@@ -79,7 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {// 继承SQLiteOpenHelper�
         // 这样就可以把一个数据库从旧的模型转变到新的模型
         // 这个方法中主要完成更改数据库版本的操作
 
-        Log.d(TAG, "DatabaseHelper onUpgrade");
+        LogUtil.d(TAG, "DatabaseHelper onUpgrade");
 
 //        switch (oldVersion) {
 //            case 1:
@@ -133,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {// 继承SQLiteOpenHelper�
         super.onOpen(db);
         // 每次打开数据库之后首先被执行
 
-        Log.d(TAG, "DatabaseHelper onOpen");
+        LogUtil.d(TAG, "DatabaseHelper onOpen");
     }
 
 }

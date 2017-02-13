@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">衣帽間</string>
+    <string name="my_wardrobe">我的衣櫃</string>
+    <string name="choose_photo">選擇照片</string>
+    <string name="wardrobe_top">上衣︱TOP</string>
+    <string name="wardrobe_top_describe">Gentle and Lovely</string>
+    <string name="wardrobe_bottoms">下裝︱BOTTOMS</string>
+    <string name="wardrobe_bottoms_describe">The Spirit of Seduction</string>
+    <string name="wardrobe_skirt">連衣裙︱SKIRT</string>
+    <string name="wardrobe_skirt_describe">Beautiful Temptation</string>
+    <string name="wardrobe_shoes">鞋子︱SHOES</string>
+    <string name="wardrobe_shoes_describe">Your own personal style</string>
+    <string name="wardrobe_overcoat">外套︱OVERCOAT</string>
+    <string name="wardrobe_overcoat_describe">Life is Beautiful</string>
+    <string name="wardrobe_other">配飾︱OTHER</string>
+    <string name="wardrobe_other_describe">The Ornament Temperament</string>
+    <string name="wardrobe_empty_hint">衣櫃還是空的，怎麼忍，買買買</string>
+    <string name="hint_for_blind_take_photo">點擊此處拍攝衣物</string>
+    <string name="hint_for_blind_choose_photo_yes">確認選擇該照片</string>
+    <string name="albums">相冊</string>
+    <string name="wardrobe_boundary_hint">再翻就突破次元了哦~</string>
+    <string name="delete_failed_hint">刪除失敗</string>
+    <string name="delete_succeed_hint">刪除成功</string>
+    <string name="camera_do_not_available_hint">應用未被授予訪問相機的權限</string>
+</resources>

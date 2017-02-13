@@ -3,7 +3,7 @@ package com.wardrobe.www;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
+import com.wardrobe.www.Utils.LogUtil;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -19,7 +19,7 @@ import java.util.Locale;
 public class BaseActivity extends Activity {
     private static final String TAG = "BaseActivity";
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/Wardrobe/";
-    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class BaseActivity extends Activity {
         boolean isDirectoryCreated = file.exists();
         if (!isDirectoryCreated) {//文件夹不存在
             file.mkdirs();
-            Log.d(TAG, "PATH= " + PATH);
+            LogUtil.d(TAG, "PATH= " + PATH);
         } else {//文件夹存在
             writeSDFile(df.format(new Date()), "log.txt");//写入文件夹创建时间，即APP安装时间
         }
@@ -46,15 +46,15 @@ public class BaseActivity extends Activity {
                 DataOutputStream out = new DataOutputStream(os);
                 out.writeShort(2);
                 out.writeUTF("");
-                Log.d(TAG, out.toString());
+                LogUtil.d(TAG, out.toString());
                 fw.flush();
                 fw.close();
-                Log.d(TAG, fw.toString());
+                LogUtil.d(TAG, fw.toString());
             } else {
-                Log.d(TAG, f.toString() + " is already exist!");
+                LogUtil.d(TAG, f.toString() + " is already exist!");
             }
         } catch (Exception e) {
-            Log.d(TAG, e.toString());
+            LogUtil.d(TAG, e.toString());
         }
     }
 

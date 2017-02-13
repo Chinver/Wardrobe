@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wardrobe.www.Utils.BaseUtils;
+import com.wardrobe.www.Utils.LogUtil;
 import com.wardrobe.www.adapter.AlbumAdapter;
 import com.wardrobe.www.db.DatabaseHelper;
 import com.wardrobe.www.model.Clothes;
@@ -191,7 +192,7 @@ public class AlbumActivity extends BaseActivity implements AdapterView.OnItemCli
                 }
             });
         } else {
-            Log.e(TAG, "There is no action bar");
+            LogUtil.e(TAG, "There is no action bar");
         }
     }
 
@@ -230,28 +231,32 @@ public class AlbumActivity extends BaseActivity implements AdapterView.OnItemCli
             fosFrom.close();
             fosTo.close();
         } catch (FileNotFoundException e) {
-            Log.e("复制文件异常", e.toString());
+            LogUtil.e("复制文件异常", e.toString());
         } catch (IOException e) {
-            Log.e("复制文件异常", e.toString());
+            LogUtil.e("复制文件异常", e.toString());
         }
     }
 
     private void initGrid() {
-        if (clothesList != null && clothesList.size() > 0) {
-            clothesList.clear();
-        }
-        clothesList = getPhotos(albumsPath, clothesList);
-        if (clothesList != null && clothesList.size() > 1) {
-            clothesList = BaseUtils.quickSort(clothesList, 1, clothesList.size() - 1);
-        }
         if (selectedClothesList == null) {
             selectedClothesList = new ArrayList<>();
         }
-        cameraGridView = (GridView) findViewById(R.id.grid_update_photo);
-        AlbumAdapter cameraGridViewAdapter = new AlbumAdapter(AlbumActivity.this, clothesList);
+        if (clothesList != null && clothesList.size() > 0) {
+            clothesList.clear();
+        } else {
+            clothesList = new ArrayList<>();
+        }
+        clothesList = getPhotos(albumsPath, clothesList);
+        if (clothesList != null && clothesList.size() > 0) {
+            if (clothesList.size() > 1) {
+                clothesList = BaseUtils.quickSort(clothesList, 1, clothesList.size() - 1);
+            }
+            cameraGridView = (GridView) findViewById(R.id.grid_update_photo);
+            AlbumAdapter cameraGridViewAdapter = new AlbumAdapter(AlbumActivity.this, clothesList);
 //        cameraGridViewAdapter.notifyDataSetChanged();
-        cameraGridView.setAdapter(cameraGridViewAdapter);// 为GridView设置适配器
-        cameraGridView.setOnItemClickListener(this);
+            cameraGridView.setAdapter(cameraGridViewAdapter);// 为GridView设置适配器
+            cameraGridView.setOnItemClickListener(this);
+        }
     }
 
     @Override
@@ -264,13 +269,13 @@ public class AlbumActivity extends BaseActivity implements AdapterView.OnItemCli
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     canTakePhoto = true;
-                    Log.d(TAG, "The permission of camera is granted.");
+                    LogUtil.d(TAG, "The permission of camera is granted.");
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
 
                 } else {
                     canTakePhoto = false;
-                    Log.d(TAG, "the permission of camera is denied.");
+                    LogUtil.d(TAG, "the permission of camera is denied.");
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -312,7 +317,7 @@ public class AlbumActivity extends BaseActivity implements AdapterView.OnItemCli
             } else {
                 Toast.makeText(AlbumActivity.this, getString(R.string.camera_do_not_available_hint), Toast.LENGTH_SHORT).show();
             }
-        } else {
+        } else if (position > 0) {
             int index = position - parent.getFirstVisiblePosition();
             Clothes temp = clothesList.get(position - 1);
             if (!temp.isChosen()) {
@@ -340,11 +345,11 @@ public class AlbumActivity extends BaseActivity implements AdapterView.OnItemCli
         //照片的命名，目标文件夹下，以当前时间数字串为名称，即可确保每张照片名称不相同。
         String photoName;
         Date date;
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINESE);//获取当前时间，进一步转化为字符串
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());//获取当前时间，进一步转化为字符串
         date = new Date();
         photoName = format.format(date);
         String photoPath = photosPath + photoName + ".jpg";
-        Log.d(TAG, "File = " + photoPath);
+        LogUtil.d(TAG, "File = " + photoPath);
         clothes.setImgUrl(photoPath);
         clothes.setDivision(bundle.getString("division"));//照片所属的服饰分类
         return photoPath;
