@@ -1,14 +1,15 @@
 package com.wardrobe.www;
 
-import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.Menu;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -19,11 +20,12 @@ import com.wardrobe.www.model.Division;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DivisionActivity extends BaseActivity/* implements View.OnClickListener*/ {
+public class DivisionActivity extends BaseActivity {
     private Intent intent;
     private Bundle bundle;
     private RecyclerView recyclerView;
     private Division division;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,23 +35,36 @@ public class DivisionActivity extends BaseActivity/* implements View.OnClickList
         init();
     }
 
-
-
     private void init() {
-//        initView();
-
         if (intent == null) {
             intent = new Intent();
         }
-        bundle = intent.getExtras();
-        if (bundle == null) {
-            bundle = new Bundle();
-        }
-
+        initToolbar();
         initRecycler();
     }
 
-    private void initRecycler(){
+    private void initToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_unfold);
+        setSupportActionBar(mToolbar);
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            actionbar.setTitle("");
+            Button leftBtn = (Button) findViewById(R.id.toolbar_unfold_btn_left);
+            leftBtn.setBackground(ContextCompat.getDrawable(this, R.drawable.icon_nav));
+            leftBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+            Button rightBtn = (Button) findViewById(R.id.toolbar_unfold_btn_right);
+            rightBtn.setVisibility(View.GONE);
+            TextView titleText = (TextView) findViewById(R.id.toolbar_unfold_text_title);
+            titleText.setText(R.string.my_wardrobe);
+        }
+    }
+
+    private void initRecycler() {
         List<Division> divisionList = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             division = new Division();
@@ -89,11 +104,16 @@ public class DivisionActivity extends BaseActivity/* implements View.OnClickList
         }
         recyclerView = (RecyclerView) findViewById(R.id.recycler_division);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new SpaceItemDecoration());
         DivisionAdapter divisionAdapter = new DivisionAdapter(divisionList);
         recyclerView.setAdapter(divisionAdapter);
         recyclerView.addOnItemTouchListener(new OnItemClickListener() {
             @Override
             public void SimpleOnItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+                bundle = intent.getExtras();
+                if (bundle == null) {
+                    bundle = new Bundle();
+                }
                 Division division = (Division) baseQuickAdapter.getItem(i);
                 bundle.putString("division", getString(division.getNameCN()));
                 intent.setClass(DivisionActivity.this, WardrobeActivity.class);
@@ -103,29 +123,23 @@ public class DivisionActivity extends BaseActivity/* implements View.OnClickList
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.main, menu);
-        initActionBar(R.layout.actionbar_main, this);
-        return true;
-    }
+    public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
+        int mSpace;
 
-    private void initActionBar(int layoutId, Context mContext) {
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowHomeEnabled(false);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(R.layout.actionbar_main);
+        public SpaceItemDecoration() {
+            this.mSpace = DivisionActivity.this.getResources().getDimensionPixelSize(R.dimen.divider);
+        }
 
-        //LayoutInflater inflater = getLayoutInflater();
-        LayoutInflater inflater = DivisionActivity.this.getLayoutInflater();   //先获取当前布局的填充器
-        View actionbarLayout = inflater.inflate(R.layout.actionbar_main, null);   //通过填充器获取另外一个布局的对象
-        ActionBar.LayoutParams layout = new ActionBar.LayoutParams(
-                ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
-        actionBar.setCustomView(actionbarLayout, layout);
-        TextView actionbarTextView = (TextView) actionbarLayout.findViewById(R.id.text_actionbar_main);
-        actionbarTextView.setText(R.string.my_wardrobe);
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int pos = parent.getChildAdapterPosition(view);
+
+            if (pos > 0) {
+                outRect.top = mSpace;
+            } else {
+                outRect.top = 0;
+            }
+        }
     }
 
 }

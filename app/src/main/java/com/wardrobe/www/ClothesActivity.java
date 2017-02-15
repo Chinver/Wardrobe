@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -16,14 +18,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wardrobe.www.Utils.LogUtil;
+import com.bumptech.glide.Glide;
 import com.wardrobe.www.db.DatabaseHelper;
 import com.wardrobe.www.model.Clothes;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
-
-import org.xutils.image.ImageOptions;
-import org.xutils.view.annotation.ViewInject;
-import org.xutils.x;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,23 +34,22 @@ import java.util.List;
 public class ClothesActivity extends BaseActivity implements View.OnTouchListener,
         GestureDetector.OnGestureListener {
     private static final String TAG = "ClothesActivity";
+    private static final int FLING_MIN_DISTANCE = 100;
+    private static final int FLING_MIN_VELOCITY = 0;
+
+    private Toolbar mToolbar;
 
     private Intent intent;
     private Bundle bundle;
     private Clothes clothes;
     private List<Clothes> clothesList;
-    //    private List<Integer> deleteList = new ArrayList<>();
-    private ImageOptions imageOptions;
     private int position = 0;
     private ClothesServiceImpl clothesService;
     private DatabaseHelper databaseHelper;
     private boolean isDelete = false;
 
     private GestureDetector mGestureDetector;
-    private static final int FLING_MIN_DISTANCE = 100;
-    private static final int FLING_MIN_VELOCITY = 0;
 
-    @ViewInject(R.id.image_clothes)
     private ImageView clothesImage;
 
     @Override
@@ -64,16 +61,6 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
     }
 
     private void init() {
-        x.view().inject(this);
-        imageOptions = new ImageOptions.Builder()
-                // 加载中或错误图片的ScaleType(缩放方式)
-//                .setPlaceholderScaleType(ImageView.ScaleType.MATRIX)
-                // 默认自动适应大小
-                // .setSize(...)
-                .setIgnoreGif(false)
-                // 如果使用本地文件url, 添加这个设置可以在本地文件更新后刷新立即生效.
-                .setUseMemCache(false)
-                .setImageScaleType(ImageView.ScaleType.CENTER_CROP).build();
         if (mGestureDetector == null) {
             mGestureDetector = new GestureDetector(ClothesActivity.this, this);
         }
@@ -87,7 +74,9 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
             clothesList = new ArrayList<>();
         }
         initIntent();
-        initImageView();
+        initToolbar();
+        clothesImage = (ImageView) findViewById(R.id.image_clothes);
+        refreshImageView();
     }
 
     private void initIntent() {
@@ -110,8 +99,61 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
         }
     }
 
-    private void initImageView() {
-        x.image().bind(clothesImage, clothes.getImgUrl(), imageOptions);
+    private void initToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_unfold);
+        setSupportActionBar(mToolbar);
+        android.support.v7.app.ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            actionbar.setTitle("");
+            Button leftBtn = (Button) findViewById(R.id.toolbar_unfold_btn_left);
+            leftBtn.setBackground(ContextCompat.getDrawable(this, R.drawable.icon_back));
+            leftBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finishActivity();
+                }
+            });
+            Button rightBtn = (Button) findViewById(R.id.toolbar_unfold_btn_right);
+            rightBtn.setBackground(ContextCompat.getDrawable(this, R.drawable.icon_ljt));
+            rightBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (clothesService.deleteClothesByName(databaseHelper, clothes.getName()) > 0) {
+                        if (position > 0) {
+                            position = position - 1;
+                            clothes = clothesList.get(position);
+                        } else {
+                            position = position + 1;
+                            clothes = clothesList.get(position);
+                        }
+                        refreshImageView();  //显示早于当前照片对应时间的照片，即下一张照片
+                        clothesList.remove(position);//删除当前下标的照片,此时该position对应的照片已自动调整为下一张照片
+                        isDelete = true;
+                        Toast.makeText(ClothesActivity.this, getString(R.string.delete_succeed_hint), Toast.LENGTH_SHORT).show();
+                        if (clothesList.size() == 0) {
+                            finishActivity();
+                        }
+                    } else {
+                        Toast.makeText(ClothesActivity.this, getString(R.string.delete_failed_hint), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            TextView titleText = (TextView) findViewById(R.id.toolbar_unfold_text_title);
+            titleText.setText(R.string.albums);
+        }
+    }
+
+    private void refreshImageView() {
+        Glide.with(this).load(clothes.getImgUrl()).thumbnail(0.8f).crossFade().into(clothesImage);
+    }
+
+    private void finishActivity() {
+        if (isDelete) {
+            setResult(RESULT_OK, intent);
+        } else {
+            setResult(RESULT_CANCELED, intent);
+        }
+        ClothesActivity.this.finish();
     }
 
     @Override
@@ -125,70 +167,6 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
             ClothesActivity.this.finish();
         }
         return super.onKeyUp(keyCode, event);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.main, menu);
-        initActionBar(R.layout.actionbar_wardrobe, this);
-        return true;
-    }
-
-    private void initActionBar(int layoutId, Context mContext) {
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            actionBar.setCustomView(R.layout.actionbar_clothes);
-
-            LayoutInflater inflater = ClothesActivity.this.getLayoutInflater();   //先获取当前布局的填充器
-            View actionbarLayout = inflater.inflate(R.layout.actionbar_clothes, null);   //通过填充器获取另外一个布局的对象
-            ActionBar.LayoutParams layout = new ActionBar.LayoutParams(
-                    ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
-            actionBar.setCustomView(actionbarLayout, layout);
-            TextView actionbarTextView = (TextView) actionbarLayout.findViewById(R.id.text_actionbar_clothes);
-            actionbarTextView.setText(R.string.albums);
-            Button backBtn = (Button) actionbarLayout.findViewById(R.id.btn_actionbar_clothes_back);//通过另外一个布局对象的findViewById获取其中的控件
-            backBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (isDelete) {
-                        setResult(RESULT_OK, intent);
-                    } else {
-                        setResult(RESULT_CANCELED, intent);
-                    }
-                    ClothesActivity.this.finish();
-                }
-            });
-            Button deleteBtn = (Button) actionbarLayout.findViewById(R.id.btn_actionbar_clothes_delete);
-            deleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (clothesService.deleteClothesByName(databaseHelper, clothesList.get(position).getName()) > 0) {
-                        clothesList.remove(position);//删除当前下标的照片,此时该position对应的照片已自动调整为下一张照片
-//                        deleteList.add(position);
-                        isDelete = true;
-                        Toast.makeText(ClothesActivity.this, getString(R.string.delete_succeed_hint), Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(ClothesActivity.this, getString(R.string.delete_failed_hint), Toast.LENGTH_SHORT).show();
-                    }
-                    //显示早于当前照片对应时间的照片，即下一张照片
-                    x.image().bind(clothesImage, clothesList.get(position).getImgUrl(), imageOptions);
-                    if (clothesList.size() == 0) {
-//                        bundle.putIntegerArrayList("deleteList", (ArrayList<Integer>) deleteList);
-                        ClothesActivity.this.finish();
-                    }
-                }
-            });
-        } else
-
-        {
-            LogUtil.e(TAG, "There is no action bar");
-        }
-
     }
 
     @Override
@@ -222,7 +200,7 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
             if (position < clothesList.size() - 1) {
                 position++;
                 clothes = clothesList.get(position);
-                initImageView();
+                refreshImageView();
             } else {
                 Toast.makeText(this, getString(R.string.wardrobe_boundary_hint), Toast.LENGTH_SHORT).show();//向左手势
             }
@@ -230,7 +208,7 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
             if (position > 0) {
                 position--;
                 clothes = clothesList.get(position);
-                initImageView();
+                refreshImageView();
             } else {
                 Toast.makeText(this, getString(R.string.wardrobe_boundary_hint), Toast.LENGTH_SHORT).show();//向右手势
             }

@@ -22,4 +22,6 @@
     <string name="delete_failed_hint">Failed to delete!</string>
     <string name="delete_succeed_hint">Succeed to delete!</string>
     <string name="camera_do_not_available_hint">Sorry, I don\'t have permission to take photo.</string>
+    <string name="ok">OK</string>
+    <string name="about_us">About</string>
 </resources>

@@ -8,4 +8,5 @@
     <color name="black">#333333</color>
     <color name="black_line">#50000000</color>
     <color name="black_shadow">#80000000</color>
+    <color name="black_1">#666666</color>
 </resources>

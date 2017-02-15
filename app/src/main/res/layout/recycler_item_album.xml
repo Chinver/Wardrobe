@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="115dp"
+    android:layout_height="115dp">
+
+    <ImageView
+        android:id="@+id/recycler_item_photo"
+        android:layout_width="115dp"
+        android:layout_height="115dp"
+        android:contentDescription="@string/hint_for_blind_take_photo" />
+
+    <RelativeLayout
+        android:id="@+id/layout_recycler_album"
+        android:layout_width="115dp"
+        android:layout_height="115dp"
+        android:background="@color/black_shadow"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/image_recycler_album_commit"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="4dp"
+            android:contentDescription="@string/hint_for_blind_choose_photo_yes"
+            android:src="@drawable/icon_sel" />
+    </RelativeLayout>
+
+</FrameLayout>

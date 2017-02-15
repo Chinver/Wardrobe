@@ -1,8 +1,14 @@
 package com.wardrobe.www;
 
-import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+
 import com.wardrobe.www.Utils.LogUtil;
 
 import java.io.DataOutputStream;
@@ -16,7 +22,7 @@ import java.util.Locale;
 /**
  * Created by admin on 2016/9/20.
  */
-public class BaseActivity extends Activity {
+public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/Wardrobe/";
     private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -24,6 +30,19 @@ public class BaseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //状态栏透明
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.LTGRAY);
+//            window.setStatusBarColor(Color.TRANSPARENT);
+        }
+        //字体黑色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
 
         File file = new File(PATH);
         boolean isDirectoryCreated = file.exists();

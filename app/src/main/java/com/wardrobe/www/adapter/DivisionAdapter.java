@@ -7,7 +7,7 @@ import com.wardrobe.www.model.Division;
 
 import java.util.List;
 
-public class DivisionAdapter extends BaseQuickAdapter<Division> {
+public class DivisionAdapter extends BaseQuickAdapter<Division,BaseViewHolder> {
 
     public DivisionAdapter(List<Division> data) {
         super(R.layout.recycler_item_division, data);

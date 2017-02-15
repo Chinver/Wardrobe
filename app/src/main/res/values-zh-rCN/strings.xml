@@ -22,4 +22,6 @@
     <string name="delete_failed_hint">删除失败</string>
     <string name="delete_succeed_hint">删除成功</string>
     <string name="camera_do_not_available_hint">应用未被授予访问相机的权限</string>
+    <string name="ok">确定</string>
+    <string name="about_us">碎碎念</string>
 </resources>

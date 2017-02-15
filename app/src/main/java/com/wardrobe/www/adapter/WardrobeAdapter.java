@@ -10,13 +10,13 @@ import com.wardrobe.www.model.Clothes;
 
 import java.util.List;
 
-public class WardrobeAdapter extends BaseQuickAdapter<Clothes> {
+public class WardrobeAdapter extends BaseQuickAdapter<Clothes,BaseViewHolder> {
     public WardrobeAdapter(List<Clothes> data) {
         super(R.layout.recycler_item_wardrobe, data);
     }
 
     @Override
     protected void convert(BaseViewHolder baseViewHolder, Clothes clothes) {
-        Glide.with(mContext).load(clothes.getImgUrl()).crossFade().into((ImageView) baseViewHolder.getView(R.id.wardrobe_item_image));
+        Glide.with(mContext).load(clothes.getImgUrl()).thumbnail(0.8f).crossFade().centerCrop().into((ImageView) baseViewHolder.getView(R.id.wardrobe_item_image));
     }
 }
