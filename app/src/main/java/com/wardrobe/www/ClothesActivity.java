@@ -1,16 +1,11 @@
 package com.wardrobe.www;
 
-import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -19,8 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.wardrobe.www.db.DatabaseHelper;
-import com.wardrobe.www.model.Clothes;
+import com.wardrobe.www.base.db.DatabaseHelper;
+import com.wardrobe.www.base.model.Clothes;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
 
 import java.util.ArrayList;
@@ -45,12 +40,11 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
     private List<Clothes> clothesList;
     private int position = 0;
     private ClothesServiceImpl clothesService;
-    private DatabaseHelper databaseHelper;
-    private boolean isDelete = false;
 
     private GestureDetector mGestureDetector;
 
     private ImageView clothesImage;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +55,11 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
     }
 
     private void init() {
+        if(databaseHelper==null){
+            databaseHelper=new DatabaseHelper(this);
+        }
         if (mGestureDetector == null) {
             mGestureDetector = new GestureDetector(ClothesActivity.this, this);
-        }
-        if (databaseHelper == null) {
-            databaseHelper = new DatabaseHelper(this);
         }
         if (clothesService == null) {
             clothesService = new ClothesServiceImpl();
@@ -110,7 +104,7 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
             leftBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    finishActivity();
+                    ClothesActivity.this.finish();
                 }
             });
             Button rightBtn = (Button) findViewById(R.id.toolbar_unfold_btn_right);
@@ -119,20 +113,17 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
                 @Override
                 public void onClick(View view) {
                     if (clothesService.deleteClothesByName(databaseHelper, clothes.getName()) > 0) {
-                        if (position > 0) {
-                            position = position - 1;
-                            clothes = clothesList.get(position);
-                        } else {
-                            position = position + 1;
-                            clothes = clothesList.get(position);
-                        }
-                        refreshImageView();  //显示早于当前照片对应时间的照片，即下一张照片
                         clothesList.remove(position);//删除当前下标的照片,此时该position对应的照片已自动调整为下一张照片
-                        isDelete = true;
-                        Toast.makeText(ClothesActivity.this, getString(R.string.delete_succeed_hint), Toast.LENGTH_SHORT).show();
                         if (clothesList.size() == 0) {
-                            finishActivity();
+                            ClothesActivity.this.finish();
+                        } else {
+                            if (position == clothesList.size()) {
+                                position = position - 1;
+                            }
+                            clothes = clothesList.get(position);
+                            refreshImageView();  //显示早于当前照片对应时间的照片，即下一张照片
                         }
+                        Toast.makeText(ClothesActivity.this, getString(R.string.delete_succeed_hint), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(ClothesActivity.this, getString(R.string.delete_failed_hint), Toast.LENGTH_SHORT).show();
                     }
@@ -144,26 +135,12 @@ public class ClothesActivity extends BaseActivity implements View.OnTouchListene
     }
 
     private void refreshImageView() {
-        Glide.with(this).load(clothes.getImgUrl()).thumbnail(0.8f).crossFade().into(clothesImage);
-    }
-
-    private void finishActivity() {
-        if (isDelete) {
-            setResult(RESULT_OK, intent);
-        } else {
-            setResult(RESULT_CANCELED, intent);
-        }
-        ClothesActivity.this.finish();
+        Glide.with(this).load(clothes.getImgUrl()).thumbnail(0.8f).fitCenter().crossFade().into(clothesImage);
     }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            if (isDelete) {
-                setResult(RESULT_OK, intent);
-            } else {
-                setResult(RESULT_CANCELED, intent);
-            }
             ClothesActivity.this.finish();
         }
         return super.onKeyUp(keyCode, event);

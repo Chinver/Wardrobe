@@ -3,7 +3,7 @@ package com.wardrobe.www.adapter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.wardrobe.www.R;
-import com.wardrobe.www.model.Division;
+import com.wardrobe.www.base.model.Division;
 
 import java.util.List;
 

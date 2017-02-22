@@ -6,7 +6,7 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.wardrobe.www.R;
-import com.wardrobe.www.model.Clothes;
+import com.wardrobe.www.base.model.Clothes;
 
 import java.util.List;
 

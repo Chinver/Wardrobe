@@ -5,9 +5,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.wardrobe.www.Utils.LogUtil;
-import com.wardrobe.www.db.DatabaseHelper;
-import com.wardrobe.www.model.Clothes;
+import com.wardrobe.www.base.util.LogUtil;
+import com.wardrobe.www.base.db.DatabaseHelper;
+import com.wardrobe.www.base.model.Clothes;
 import com.wardrobe.www.service.ClothesServiceI;
 
 import org.apache.commons.lang3.StringUtils;

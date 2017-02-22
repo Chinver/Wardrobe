@@ -1,8 +1,11 @@
 package com.wardrobe.www;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,10 +17,9 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.wardrobe.www.Utils.LogUtil;
 import com.wardrobe.www.adapter.WardrobeAdapter;
-import com.wardrobe.www.db.DatabaseHelper;
-import com.wardrobe.www.model.Clothes;
+import com.wardrobe.www.base.db.DatabaseHelper;
+import com.wardrobe.www.base.model.Clothes;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
 
 import java.util.ArrayList;
@@ -37,14 +39,10 @@ public class WardrobeActivity extends BaseActivity {
     private Clothes clothes;
     private List<Clothes> clothesList;
     private ClothesServiceImpl clothesService;
-    private DatabaseHelper databaseHelper;
     private TextView emptyHintText;
     private RecyclerView wardrobeRecycler;
     private WardrobeAdapter wardrobeAdapter;
-    private Toolbar mToolbar;
-
-    private static final int DELETE_CLOTHES = 1;
-    private static final int INSERT_CLOTHES = 2;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +53,9 @@ public class WardrobeActivity extends BaseActivity {
     }
 
     private void init() {
+        if (databaseHelper == null) {
+            databaseHelper = new DatabaseHelper(this);
+        }
         initClothes();
         initIntent();
         initToolbar();
@@ -62,7 +63,7 @@ public class WardrobeActivity extends BaseActivity {
     }
 
     private void initToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_fold);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_fold);
         setSupportActionBar(mToolbar);
         android.support.v7.app.ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
@@ -80,7 +81,7 @@ public class WardrobeActivity extends BaseActivity {
                 public void onClick(View v) {
                     intent.setClass(WardrobeActivity.this, AlbumActivity.class);
                     intent.putExtras(bundle);
-                    startActivityForResult(intent, INSERT_CLOTHES);
+                    startActivity(intent);
                 }
             });
             rightBtn.setBackground(ContextCompat.getDrawable(this, R.drawable.icon_tj));
@@ -103,9 +104,6 @@ public class WardrobeActivity extends BaseActivity {
     }
 
     private void initClothes() {
-        if (databaseHelper == null) {
-            databaseHelper = new DatabaseHelper(this);
-        }
         if (clothesService == null) {
             clothesService = new ClothesServiceImpl();
         }
@@ -116,6 +114,7 @@ public class WardrobeActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
+        refreshRecyclerData();
         super.onResume();
     }
 
@@ -126,37 +125,7 @@ public class WardrobeActivity extends BaseActivity {
         // 设置item动画
         wardrobeRecycler.setItemAnimator(new DefaultItemAnimator());
         wardrobeRecycler.addItemDecoration(new SpaceItemDecoration());
-//        wardrobeRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-//
-//                int totalItemCount = layoutManager.getItemCount();
-//
-//                int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-//
-//                if (!loading && totalItemCount < (lastVisibleItem + 5)) {
-//                    page++;
-//                    loading = true;
-//                    refreshRecycler();
-//                }
-//            }
-//        });
-        refreshRecyclerData();
-
-    }
-
-    private void refreshRecyclerData() {
-        if (clothesList != null && clothesList.size() > 0) {
-            clothesList.clear();
-        } else {
-            clothesList = new ArrayList<>();
-        }
-        clothesList = clothesService.showClothesByDivision(databaseHelper, division);
+        getData();
         if (clothesList.size() <= 0) {
             emptyHintText.setVisibility(View.VISIBLE);
             wardrobeRecycler.setVisibility(View.GONE);
@@ -167,10 +136,10 @@ public class WardrobeActivity extends BaseActivity {
             emptyHintText.setVisibility(View.GONE);
             wardrobeRecycler.setVisibility(View.VISIBLE);
             wardrobeAdapter = new WardrobeAdapter(clothesList);
-            wardrobeRecycler.setAdapter(wardrobeAdapter);// 为GridView设置适配器
+            wardrobeRecycler.setAdapter(wardrobeAdapter);
             wardrobeRecycler.addOnItemTouchListener(new OnItemClickListener() {
                 @Override
-                public void SimpleOnItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+                public void onSimpleItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
                     Clothes clothes = (Clothes) baseQuickAdapter.getItem(i);
                     bundle.putInt("position", i);
                     bundle.putString("division", clothes.getDivision());
@@ -178,40 +147,49 @@ public class WardrobeActivity extends BaseActivity {
                     bundle.putParcelableArrayList("clothes", (ArrayList<Clothes>) clothesList);
                     intent.putExtras(bundle);
                     intent.setClass(WardrobeActivity.this, ClothesActivity.class);
-                    startActivityForResult(intent, DELETE_CLOTHES);
+                    startActivity(intent);
                 }
             });
-            wardrobeAdapter.openLoadAnimation();
-            wardrobeAdapter.notifyDataSetChanged();
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            LogUtil.d(TAG,"resultCode="+resultCode);
-            if (requestCode == DELETE_CLOTHES) {
-//                Bundle bundle = data.getExtras();
-//                ArrayList<Integer> list = bundle.getIntegerArrayList("deleteList");
-//                if (list != null && list.size() > 0) {
-//                    for (Integer temp : list) {
-//                        wardrobeAdapter.removeItem(temp);
-//                    }
-//                }
-            } else if (requestCode == INSERT_CLOTHES) {
-//                Bundle bundle = data.getExtras();
-//                ArrayList<Integer> list = bundle.getIntegerArrayList("deleteList");
-//                if (list != null && list.size() > 0) {
-//                    for (Integer temp : list) {
-//                        wardrobeAdapter.removeItem(temp);
-//                    }
-//                }
-
+    private void refreshRecyclerData() {
+        getData();
+        if (clothesList != null && clothesList.size() > 0) {
+            emptyHintText.setVisibility(View.GONE);
+            wardrobeRecycler.setVisibility(View.VISIBLE);
+            if (wardrobeAdapter == null) {
+                wardrobeAdapter = new WardrobeAdapter(clothesList);
+                wardrobeRecycler.setAdapter(wardrobeAdapter);
+                wardrobeRecycler.addOnItemTouchListener(new OnItemClickListener() {
+                    @Override
+                    public void onSimpleItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+                        Clothes clothes = (Clothes) baseQuickAdapter.getItem(i);
+                        bundle.putInt("position", i);
+                        bundle.putString("division", clothes.getDivision());
+                        bundle.putString("imgUrl", clothes.getImgUrl());
+                        bundle.putParcelableArrayList("clothes", (ArrayList<Clothes>) clothesList);
+                        intent.putExtras(bundle);
+                        intent.setClass(WardrobeActivity.this, ClothesActivity.class);
+                        startActivity(intent);
+                    }
+                });
+            } else {
+                wardrobeAdapter.setNewData(clothesList);
             }
-            refreshRecyclerData();
+        } else {
+            emptyHintText.setVisibility(View.VISIBLE);
+            wardrobeRecycler.setVisibility(View.GONE);
         }
+    }
 
+    private void getData() {
+        if (clothesList != null && clothesList.size() > 0) {
+            clothesList.clear();
+        } else {
+            clothesList = new ArrayList<>();
+        }
+        clothesList = clothesService.showClothesByDivision(databaseHelper, division);
     }
 
     public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
@@ -227,10 +205,17 @@ public class WardrobeActivity extends BaseActivity {
 
             outRect.top = mSpace;
             if (pos % 2 == 0) {
-                outRect.right = mSpace;
                 outRect.left = mSpace;
+                outRect.right = mSpace / 2;
+            } else {
+                outRect.right = mSpace;
+                outRect.left = mSpace / 2;
             }
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }

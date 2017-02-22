@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wardrobe.www">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="false"
@@ -11,7 +17,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".DivisionActivity"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,20 +27,17 @@
         </activity>
         <activity
             android:name=".WardrobeActivity"
-            android:launchMode="singleTop" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AlbumActivity"
-            android:launchMode="singleTop" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ClothesActivity"
-            android:launchMode="singleTop" />
-
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SelfTalkingActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>

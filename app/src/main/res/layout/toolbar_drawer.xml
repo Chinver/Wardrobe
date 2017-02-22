@@ -19,41 +19,22 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_fold"
+                android:id="@+id/toolbar_drawer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
                 android:minHeight="?attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-                <Button
-                    android:id="@+id/toolbar_fold_btn_left"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="start"
-                    android:layout_marginStart="16dp"
-                    android:background="@drawable/icon_back"
-                    android:gravity="center" />
-
                 <TextView
-                    android:id="@+id/toolbar_fold_text_title"
+                    android:id="@+id/toolbar_drawer_text_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="center"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
-
-                <Button
-                    android:id="@+id/toolbar_fold_btn_right"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="end"
-                    android:layout_marginEnd="16dp"
-                    android:gravity="center" />
             </android.support.v7.widget.Toolbar>
-
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
 

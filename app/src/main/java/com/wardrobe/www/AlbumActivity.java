@@ -2,7 +2,6 @@ package com.wardrobe.www;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -10,29 +9,30 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.wardrobe.www.Utils.BaseUtils;
-import com.wardrobe.www.Utils.LogUtil;
+import com.wardrobe.www.base.util.BaseUtils;
+import com.wardrobe.www.base.util.LogUtil;
 import com.wardrobe.www.adapter.AlbumAdapter;
-import com.wardrobe.www.db.DatabaseHelper;
-import com.wardrobe.www.model.Clothes;
+import com.wardrobe.www.base.db.DatabaseHelper;
+import com.wardrobe.www.base.model.Clothes;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
 
 
@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
 /**
  * Class Name：UpdatePhotoActivity
  * Class Function（Chinese）：用户可在该界面进入拍照模式，也可以选择本地相册中已存在的图片
@@ -60,6 +61,7 @@ public class AlbumActivity extends BaseActivity {
     private static final String TAG = "AlbumActivity";
     private static final int REQUEST_PERMISSION_CAMERA_CODE = 1;
     private static final int LIST_TAKE_PHOTO = 3;
+    private static final int TAKE_PHOTO = 4;
 
     private String photosPath = Environment.getExternalStorageDirectory().getPath() + "/Wardrobe/Photo/";
     private String albumsPath = Environment.getExternalStorageDirectory().getPath() + "/DCIM/Camera/";
@@ -67,15 +69,14 @@ public class AlbumActivity extends BaseActivity {
     private Bundle bundle;
     private Clothes clothes;
     private ClothesServiceImpl clothesService;
-    private DatabaseHelper databaseHelper;
     private Toolbar mToolbar;
     private RecyclerView recyclerView;
-
     private List<Clothes> clothesList;
     private List<Clothes> selectedClothesList;
     private SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());//设置时间格式
     private SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());//设置日期格式
     private ContentResolver mContentResolver;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,9 @@ public class AlbumActivity extends BaseActivity {
     }
 
     private void init() {
+        if (databaseHelper == null) {
+            databaseHelper = new DatabaseHelper(this);
+        }
         initClothes();
         initIntent();
         initToolbar();
@@ -105,9 +109,6 @@ public class AlbumActivity extends BaseActivity {
     }
 
     private void initClothes() {
-        if (databaseHelper == null) {
-            databaseHelper = new DatabaseHelper(this);
-        }
         if (clothesService == null) {
             clothesService = new ClothesServiceImpl();
         }
@@ -127,7 +128,6 @@ public class AlbumActivity extends BaseActivity {
             leftBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setResult(RESULT_CANCELED, intent);
                     AlbumActivity.this.finish();
                 }
             });
@@ -141,8 +141,8 @@ public class AlbumActivity extends BaseActivity {
                         temp.setDivision(bundle.getString("division"));
                         temp.setDate(sdfDate.format(new Date()));
                         clothesService.insertClothes(databaseHelper, temp);
+
                     }
-                    setResult(RESULT_OK, intent);
                     AlbumActivity.this.finish();
                 }
             });
@@ -151,25 +151,9 @@ public class AlbumActivity extends BaseActivity {
         }
     }
 
-    private void doTakePhoto() {//申请相机的相关授权
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PERMISSION_CAMERA_CODE);
-        } else {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-            File out = new File(getPhotoPath());
-            Uri uri = Uri.fromFile(out);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-            startActivityForResult(intent, LIST_TAKE_PHOTO);
-        }
-    }
-
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            setResult(RESULT_CANCELED, intent);
             AlbumActivity.this.finish();
         }
         return super.onKeyUp(keyCode, event);
@@ -230,8 +214,11 @@ public class AlbumActivity extends BaseActivity {
         albumAdapter.openLoadAnimation();
         recyclerView.addOnItemTouchListener(new OnItemClickListener() {
             @Override
-            public void SimpleOnItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
+            public void onSimpleItemClick(BaseQuickAdapter baseQuickAdapter, View view, int i) {
                 if (i == 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        doGetPermission();
+                    }
                     doTakePhoto();
                 } else {
                     Clothes temp = (Clothes) baseQuickAdapter.getItem(i);
@@ -248,6 +235,23 @@ public class AlbumActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    private void doGetPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_PERMISSION_CAMERA_CODE);
+        }
+    }
+
+    private void doTakePhoto() {//申请相机的相关授权
+        intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, TAKE_PHOTO);
+        File out = new File(getPhotoPath());
+        Uri uri = Uri.fromFile(out);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        startActivityForResult(intent, LIST_TAKE_PHOTO);
     }
 
     private void initPhotos() {
@@ -291,51 +295,46 @@ public class AlbumActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_PERMISSION_CAMERA_CODE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    LogUtil.d(TAG, "The permission of camera is granted.");
-
-                } else {
-                    LogUtil.d(TAG, "the permission of camera is denied.");
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                        AlertDialog dialog = new AlertDialog.Builder(this)
-                                .setMessage(R.string.camera_do_not_available_hint)
-                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }).create();
-                        dialog.show();
-                        return;
-                    }
-                }
-                break;
+        if (requestCode == REQUEST_PERMISSION_CAMERA_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                LogUtil.d(TAG, "The permission of camera is granted.");
+            } else {
+                LogUtil.e(TAG, "the permission of camera is denied.");
+//                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+//                    AlertDialog dialog = new AlertDialog.Builder(this)
+//                            .setMessage(R.string.camera_do_not_available_hint)
+//                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            }).create();
+//                    dialog.show();
+//                }
+                Toast.makeText(AlbumActivity.this, getString(R.string.camera_do_not_available_hint), Toast.LENGTH_SHORT).show();
             }
-            default:
-                break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == LIST_TAKE_PHOTO) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true; // 设置了此属性一定要记得将值设置为false
                 Bitmap bitmap = BitmapFactory.decodeFile(clothes.getImgUrl());
                 // 防止OOM发生
                 options.inJustDecodeBounds = false;
                 bitmap.recycle();//回收
-                clothesService.insertClothes(databaseHelper, clothes);
+                if (clothesService.insertClothes(databaseHelper, clothes) > 0) {
+                    this.finish();
+                }
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
@@ -349,13 +348,14 @@ public class AlbumActivity extends BaseActivity {
         file.mkdirs();
         //照片的命名，目标文件夹下，以当前时间数字串为名称，即可确保每张照片名称不相同。
         String photoName;
-        Date date;
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());//获取当前时间，进一步转化为字符串
-        date = new Date();
-        photoName = format.format(date);
+        photoName = format.format(new Date());
         String photoPath = photosPath + photoName + ".jpg";
-        LogUtil.d(TAG, "File = " + photoPath);
+        LogUtil.d(TAG, "File : " + photoPath);
+        clothes.setName(photoName + ".jpg");
         clothes.setImgUrl(photoPath);
+        clothes.setDate(sdfDate.format(new Date()));
+        clothes.setTime(sdfTime.format(new Date()));
         clothes.setDivision(bundle.getString("division"));//照片所属的服饰分类
         return photoPath;
     }
@@ -377,13 +377,15 @@ public class AlbumActivity extends BaseActivity {
                 outRect.top = mSpace;
             }
             if (pos % 3 == 0) {
-                outRect.right = mSpace / 2;
                 outRect.left = mSpace;
             } else if (pos % 3 == 1) {
                 outRect.right = mSpace / 2;
                 outRect.left = mSpace / 2;
+            } else if (pos % 3 == 2) {
+                outRect.right = mSpace;
             }
 
         }
     }
+
 }

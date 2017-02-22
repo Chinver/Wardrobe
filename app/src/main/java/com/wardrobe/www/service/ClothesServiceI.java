@@ -1,7 +1,7 @@
 package com.wardrobe.www.service;
 
-import com.wardrobe.www.db.DatabaseHelper;
-import com.wardrobe.www.model.Clothes;
+import com.wardrobe.www.base.db.DatabaseHelper;
+import com.wardrobe.www.base.model.Clothes;
 
 import java.util.List;
 
@@ -16,6 +16,6 @@ public interface ClothesServiceI extends BaseServiceI {
 
     List<Clothes> showClothesByDivision(DatabaseHelper databaseHelper, String division);
 
-    int deleteClothesByName(DatabaseHelper databaseHelper, String namr);
+    int deleteClothesByName(DatabaseHelper databaseHelper, String name);
 
 }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/self_talking_date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:lines="1"
+        android:textColor="@color/black_1"
+        android:textSize="16sp" />
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/layout_line_date"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_marginStart="9dp"-->
+    <!--android:orientation="vertical"-->
+    <!--android:layout_marginTop="4dp">-->
+
+
+    <!--<de.hdodenhof.circleimageview.CircleImageView-->
+    <!--android:layout_width="9dp"-->
+    <!--android:layout_height="9dp"-->
+    <!--android:src="@color/blue_1" />-->
+
+    <!--<View-->
+    <!--android:id="@+id/line_date_bottom"-->
+    <!--android:layout_width="2dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:background="@color/gray_2"-->
+    <!--android:layout_marginTop="5dp"/>-->
+    <!--</LinearLayout>-->
+
+
+    <TextView
+        android:id="@+id/self_talking_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/self_talking_date_text"
+        android:lineSpacingMultiplier="1.3"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_marginStartPercent="5%" />
+
+    <TextView
+        android:id="@+id/self_talking_content_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/self_talking_title_text"
+        android:layout_toEndOf="@+id/self_talking_date_text"
+        android:lineSpacingMultiplier="1.3"
+        android:textColor="@color/gray_1"
+        android:textSize="14sp"
+        app:layout_marginStartPercent="5%"
+        app:layout_marginTopPercent="4%" />
+</android.support.percent.PercentRelativeLayout>

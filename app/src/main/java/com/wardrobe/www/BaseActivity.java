@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.wardrobe.www.Utils.LogUtil;
+import com.wardrobe.www.base.util.LogUtil;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -19,9 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Created by admin on 2016/9/20.
- */
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
     private static final String PATH = Environment.getExternalStorageDirectory().getPath() + "/Wardrobe/";
@@ -36,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.LTGRAY);
+            window.setStatusBarColor(Color.BLACK);
 //            window.setStatusBarColor(Color.TRANSPARENT);
         }
         //字体黑色
@@ -80,5 +77,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

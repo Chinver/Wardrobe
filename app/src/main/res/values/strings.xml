@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Wardrobe</string>
-    <string name="my_wardrobe">My Wardrobe</string>
-    <string name="choose_photo">choose a photo</string>
+    <string name="app_name">衣帽间</string>
+    <string name="my_wardrobe">我的衣柜</string>
+    <string name="choose_photo">选择照片</string>
     <string name="wardrobe_top">上衣︱TOP</string>
     <string name="wardrobe_top_describe">Gentle and Lovely</string>
     <string name="wardrobe_bottoms">下装︱BOTTOMS</string>
@@ -14,14 +14,26 @@
     <string name="wardrobe_overcoat_describe">Life is Beautiful</string>
     <string name="wardrobe_other">配饰︱OTHER</string>
     <string name="wardrobe_other_describe">The Ornament Temperament</string>
-    <string name="wardrobe_empty_hint">Wardrobe is empty!Let\'s fill it!</string>
-    <string name="hint_for_blind_take_photo">Click here to take a photo of your clothes</string>
-    <string name="hint_for_blind_choose_photo_yes">Make sure to click this photo</string>
-    <string name="albums">Albums</string>
-    <string name="wardrobe_boundary_hint">There is the boundary of your wardrobe.</string>
-    <string name="delete_failed_hint">Failed to delete!</string>
-    <string name="delete_succeed_hint">Succeed to delete!</string>
-    <string name="camera_do_not_available_hint">Sorry, I don\'t have permission to take photo.</string>
-    <string name="ok">OK</string>
-    <string name="about_us">About</string>
+    <string name="wardrobe_empty_hint">衣柜还是空的，怎么忍，买买买</string>
+    <string name="hint_for_blind_take_photo">点击此处拍摄衣物</string>
+    <string name="hint_for_blind_choose_photo_yes">确认选中该照片</string>
+    <string name="albums">相册</string>
+    <string name="wardrobe_boundary_hint">再翻就突破次元了哦~</string>
+    <string name="delete_failed_hint">删除失败</string>
+    <string name="delete_succeed_hint">删除成功</string>
+    <string name="camera_do_not_available_hint">应用未被授予访问相机的权限</string>
+    <string name="ok">确定</string>
+    <string name="about_us">关于我们</string>
+    <string name="self_talking">碎碎念</string>
+    <string name="clear_cache">清除缓存</string>
+    <string name="check_version">检查更新</string>
+    <string name="version">当前版本号:</string>
+    <string name="version_unknown">当前版本号:未知</string>
+    <string name="exit_account">切换账号</string>
+    <string name="coming_soon">该功能正在拼命赶来的路上</string>
+    <string name="lucky">小确幸</string>
+    <string name="contact_us">联系我们</string>
+    <string name="copyright">三角铁版权所有</string>
+    <string name="drawer_open">开启</string>
+    <string name="drawer_close">关闭</string>
 </resources>

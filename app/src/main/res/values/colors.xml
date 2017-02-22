@@ -9,4 +9,7 @@
     <color name="black_line">#50000000</color>
     <color name="black_shadow">#80000000</color>
     <color name="black_1">#666666</color>
+    <color name="gray_1">#aaaaaa</color>
+    <color name="gray_2">#e5e5e5</color>
+    <color name="blue_1">#89daf5</color>
 </resources>

@@ -23,5 +23,17 @@
     <string name="delete_succeed_hint">刪除成功</string>
     <string name="camera_do_not_available_hint">應用未被授予訪問相機的權限</string>
     <string name="ok">確定</string>
-    <string name="about_us">碎碎唸</string>
+    <string name="self_talking">碎碎唸</string>
+    <string name="clear_cache">清除緩存</string>
+    <string name="check_version">檢查更新</string>
+    <string name="version">當前版本號:</string>
+    <string name="version_unknown">當前版本號:未知</string>
+    <string name="exit_account">切換賬號</string>
+    <string name="coming_soon">該功能正在拼命趕來的路上</string>
+    <string name="lucky">小確幸</string>
+    <string name="about_us">關於我們</string>
+    <string name="contact_us">聯繫我們</string>
+    <string name="copyright">三角鐵版權所有</string>
+    <string name="drawer_open">開啟</string>
+    <string name="drawer_close">關閉</string>
 </resources>
