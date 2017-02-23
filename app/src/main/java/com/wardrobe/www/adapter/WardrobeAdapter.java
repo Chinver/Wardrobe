@@ -17,6 +17,6 @@ public class WardrobeAdapter extends BaseQuickAdapter<Clothes,BaseViewHolder> {
 
     @Override
     protected void convert(BaseViewHolder baseViewHolder, Clothes clothes) {
-        Glide.with(mContext).load(clothes.getImgUrl()).thumbnail(0.8f).crossFade().centerCrop().into((ImageView) baseViewHolder.getView(R.id.wardrobe_item_image));
+        Glide.with(mContext).load(clothes.getImgUrl()).thumbnail(0.1f).crossFade().centerCrop().into((ImageView) baseViewHolder.getView(R.id.wardrobe_item_image));
     }
 }

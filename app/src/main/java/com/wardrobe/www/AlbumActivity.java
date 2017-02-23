@@ -20,6 +20,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -29,18 +30,15 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.wardrobe.www.base.util.BaseUtils;
-import com.wardrobe.www.base.util.LogUtil;
 import com.wardrobe.www.adapter.AlbumAdapter;
 import com.wardrobe.www.base.db.DatabaseHelper;
 import com.wardrobe.www.base.model.Clothes;
 import com.wardrobe.www.service.serviceImpl.ClothesServiceImpl;
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -59,23 +57,20 @@ import java.util.Locale;
 
 public class AlbumActivity extends BaseActivity {
     private static final String TAG = "AlbumActivity";
-    private static final int REQUEST_PERMISSION_CAMERA_CODE = 1;
+    private static final int REQUEST_PERMISSION_CAMERA = 1;
     private static final int LIST_TAKE_PHOTO = 3;
     private static final int TAKE_PHOTO = 4;
 
     private String photosPath = Environment.getExternalStorageDirectory().getPath() + "/Wardrobe/Photo/";
-    private String albumsPath = Environment.getExternalStorageDirectory().getPath() + "/DCIM/Camera/";
     private Intent intent;
     private Bundle bundle;
     private Clothes clothes;
     private ClothesServiceImpl clothesService;
-    private Toolbar mToolbar;
     private RecyclerView recyclerView;
     private List<Clothes> clothesList;
     private List<Clothes> selectedClothesList;
     private SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());//设置时间格式
     private SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());//设置日期格式
-    private ContentResolver mContentResolver;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -94,7 +89,6 @@ public class AlbumActivity extends BaseActivity {
         initIntent();
         initToolbar();
         initRecycler();
-//        initGrid();
     }
 
     private void initIntent() {
@@ -118,7 +112,7 @@ public class AlbumActivity extends BaseActivity {
     }
 
     private void initToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_unfold);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_unfold);
         setSupportActionBar(mToolbar);
         android.support.v7.app.ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
@@ -193,10 +187,8 @@ public class AlbumActivity extends BaseActivity {
             }
             fosFrom.close();
             fosTo.close();
-        } catch (FileNotFoundException e) {
-            LogUtil.e("复制文件异常", e.toString());
         } catch (IOException e) {
-            LogUtil.e("复制文件异常", e.toString());
+            Log.e(TAG, e.toString());
         }
     }
 
@@ -237,15 +229,15 @@ public class AlbumActivity extends BaseActivity {
         });
     }
 
-    private void doGetPermission() {
+    private void doGetPermission() {//申请相机的相关授权
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_PERMISSION_CAMERA_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_PERMISSION_CAMERA);
         }
     }
 
-    private void doTakePhoto() {//申请相机的相关授权
+    private void doTakePhoto() {
         intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, TAKE_PHOTO);
         File out = new File(getPhotoPath());
@@ -255,7 +247,7 @@ public class AlbumActivity extends BaseActivity {
     }
 
     private void initPhotos() {
-        mContentResolver = getContentResolver();
+        ContentResolver mContentResolver = getContentResolver();
         if (selectedClothesList == null) {
             selectedClothesList = new ArrayList<>();
         }
@@ -298,12 +290,13 @@ public class AlbumActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSION_CAMERA_CODE) {
+        if (requestCode == REQUEST_PERMISSION_CAMERA) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                LogUtil.d(TAG, "The permission of camera is granted.");
+                Log.d(TAG, "The permission of camera is granted.");
+                doTakePhoto();
             } else {
-                LogUtil.e(TAG, "the permission of camera is denied.");
+                Log.e(TAG, "the permission of camera is denied.");
 //                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
 //                    AlertDialog dialog = new AlertDialog.Builder(this)
 //                            .setMessage(R.string.camera_do_not_available_hint)
@@ -351,7 +344,7 @@ public class AlbumActivity extends BaseActivity {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());//获取当前时间，进一步转化为字符串
         photoName = format.format(new Date());
         String photoPath = photosPath + photoName + ".jpg";
-        LogUtil.d(TAG, "File : " + photoPath);
+        Log.d(TAG, "File : " + photoPath);
         clothes.setName(photoName + ".jpg");
         clothes.setImgUrl(photoPath);
         clothes.setDate(sdfDate.format(new Date()));
@@ -363,7 +356,7 @@ public class AlbumActivity extends BaseActivity {
     public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
         int mSpace;
 
-        public SpaceItemDecoration() {
+        SpaceItemDecoration() {
             this.mSpace = AlbumActivity.this.getResources().getDimensionPixelSize(R.dimen.divider);
         }
 

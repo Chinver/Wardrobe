@@ -32,16 +32,16 @@ public class AlbumAdapter extends BaseQuickAdapter<Clothes, AlbumAdapter.AlbumVi
         albumViewHolder.setImageURL(R.id.recycler_item_photo, clothes.getImgUrl(), albumViewHolder.getAdapterPosition());
     }
 
-    public class AlbumViewHolder extends BaseViewHolder {
-        public AlbumViewHolder(View view) {
+     class AlbumViewHolder extends BaseViewHolder {
+         AlbumViewHolder(View view) {
             super(view);
         }
 
-        public AlbumViewHolder setImageURL(int viewId, String url, int position) {
+         AlbumViewHolder setImageURL(int viewId, String url, int position) {
             if (position == 0) {
-                Glide.with(mContext).load(R.drawable.but_camera).thumbnail(0.8f).crossFade().centerCrop().into((ImageView) getView(viewId));
+                Glide.with(mContext).load(R.drawable.but_camera).thumbnail(0.1f).crossFade().centerCrop().into((ImageView) getView(viewId));
             } else {
-                Glide.with(mContext).load(url).thumbnail(0.8f).crossFade().centerCrop().into((ImageView) getView(viewId));
+                Glide.with(mContext).load(url).thumbnail(0.1f).crossFade().centerCrop().into((ImageView) getView(viewId));
             }
             return this;
         }

@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.wardrobe.www.base.util.DataCleanManager;
-import com.wardrobe.www.base.util.LogUtil;
 import com.wardrobe.www.adapter.DivisionAdapter;
 import com.wardrobe.www.adapter.DrawerAdapter;
 import com.wardrobe.www.base.model.Division;
@@ -259,10 +258,10 @@ public class DivisionActivity extends BaseActivity {
             PackageManager manager = this.getPackageManager();
             PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
             String version = info.versionName;
-            LogUtil.d(TAG, "version:=" + version);
+            Log.d(TAG, "version:=" + version);
             return this.getString(R.string.version) + version;
         } catch (Exception e) {
-            LogUtil.e(TAG, e.toString());
+            Log.e(TAG, e.toString());
             return this.getString(R.string.version_unknown);
         }
 
